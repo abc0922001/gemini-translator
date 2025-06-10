@@ -23,9 +23,9 @@
   "author": "abc0922001",
   "license": "MIT",
   "dependencies": {
-    "axios": "^1.6.0",
-    "yargs": "^17.7.2",
-    "@supercharge/promise-pool": "^3.1.0"
+    "@supercharge/promise-pool": "^3.2.0",
+    "axios": "^1.9.0",
+    "yargs": "^17.7.2"
   },
   "engines": {
     "node": ">=14.0.0"
