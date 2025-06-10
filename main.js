@@ -14,7 +14,7 @@ const MISTRAL_MODEL = 'mistral-small-latest';
 const argv = yargs
   .option('input', {
     alias: 'i',
-    describe: '輸入字幕檔案路徑',
+    describe: '輸入字幕檔案路徑 (SRT/WebVTT)',
     type: 'string',
     demandOption: true
   })
@@ -74,11 +74,118 @@ function parseSRT(content) {
   return subtitles;
 }
 
+// 解析 WebVTT 檔案
+function parseWebVTT(content) {
+  const subtitles = [];
+  const lines = content.split('\n');
+  let currentSubtitle = null;
+  let id = 1;
+  
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    
+    // 跳過 WEBVTT 標頭和空行
+    if (line === 'WEBVTT' || line === '' || line.startsWith('NOTE') || line.startsWith('STYLE')) {
+      continue;
+    }
+    
+    // 檢查是否為時間軸格式
+    if (line.includes('-->')) {
+      currentSubtitle = {
+        id: id++,
+        timeRange: convertWebVTTTimeToSRT(line),
+        text: ''
+      };
+      
+      // 收集字幕文字
+      let j = i + 1;
+      const textLines = [];
+      while (j < lines.length && lines[j].trim() !== '' && !lines[j].includes('-->')) {
+        const textLine = lines[j].trim();
+        if (textLine) {
+          // 移除 WebVTT 格式標籤 (如 <c>, </c>, <v>, </v> 等)
+          const cleanText = textLine.replace(/<[^>]*>/g, '').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
+          textLines.push(cleanText);
+        }
+        j++;
+      }
+      
+      if (textLines.length > 0) {
+        currentSubtitle.text = textLines.join('\n');
+        subtitles.push(currentSubtitle);
+      }
+      
+      i = j - 1; // 調整循環索引
+    }
+  }
+  
+  return subtitles;
+}
+
+// 將 WebVTT 時間格式轉換為 SRT 格式
+function convertWebVTTTimeToSRT(webvttTime) {
+  // WebVTT: 00:00:12.500 --> 00:00:15.000
+  // SRT: 00:00:12,500 --> 00:00:15,000
+  return webvttTime.replace(/\./g, ',');
+}
+
+// 將 SRT 時間格式轉換回 WebVTT 格式
+function convertSRTTimeToWebVTT(srtTime) {
+  // SRT: 00:00:12,500 --> 00:00:15,000
+  // WebVTT: 00:00:12.500 --> 00:00:15.000
+  return srtTime.replace(/,/g, '.');
+}
+
+// 自動檢測檔案格式並解析
+function parseSubtitleFile(content, filePath) {
+  const extension = path.extname(filePath).toLowerCase();
+  
+  if (extension === '.vtt') {
+    console.log('📝 檢測到 WebVTT 格式');
+    return parseWebVTT(content);
+  } else if (extension === '.srt') {
+    console.log('📝 檢測到 SRT 格式');
+    return parseSRT(content);
+  } else {
+    // 嘗試根據內容自動檢測
+    if (content.includes('WEBVTT')) {
+      console.log('📝 自動檢測為 WebVTT 格式');
+      return parseWebVTT(content);
+    } else {
+      console.log('📝 假設為 SRT 格式');
+      return parseSRT(content);
+    }
+  }
+}
+
 // 生成 SRT 內容
 function generateSRT(subtitles) {
   return subtitles.map(subtitle => 
     `${subtitle.id}\n${subtitle.timeRange}\n${subtitle.text}\n`
   ).join('\n');
+}
+
+// 生成 WebVTT 內容
+function generateWebVTT(subtitles) {
+  let content = 'WEBVTT\n\n';
+  
+  subtitles.forEach(subtitle => {
+    content += `${convertSRTTimeToWebVTT(subtitle.timeRange)}\n`;
+    content += `${subtitle.text}\n\n`;
+  });
+  
+  return content;
+}
+
+// 生成輸出內容（根據檔案格式）
+function generateSubtitleFile(subtitles, filePath) {
+  const extension = path.extname(filePath).toLowerCase();
+  
+  if (extension === '.vtt') {
+    return generateWebVTT(subtitles);
+  } else {
+    return generateSRT(subtitles);
+  }
 }
 
 // 自動修復字幕編號
@@ -238,16 +345,22 @@ async function main() {
     }
     
     // 設定輸出檔案
-    const outputFile = argv.output || inputFile.replace(/\.srt$/i, '.zh.srt');
+    let outputFile = argv.output;
+    if (!outputFile) {
+      const inputExt = path.extname(inputFile);
+      const inputName = path.basename(inputFile, inputExt);
+      const inputDir = path.dirname(inputFile);
+      outputFile = path.join(inputDir, `${inputName}.zh${inputExt}`);
+    }
     
     console.log(`📂 輸入檔案: ${inputFile}`);
     console.log(`📂 輸出檔案: ${outputFile}`);
     console.log(`🤖 使用模型: ${argv.model}`);
     
-    // 讀取並解析 SRT 檔案
+    // 讀取並解析字幕檔案
     console.log('📖 讀取字幕檔案...');
     const content = fs.readFileSync(inputFile, 'utf8');
-    let subtitles = parseSRT(content);
+    let subtitles = parseSubtitleFile(content, inputFile);
     
     if (subtitles.length === 0) {
       console.error('❌ 無法解析字幕檔案或檔案為空');
@@ -319,9 +432,9 @@ async function main() {
       process.exit(1);
     }
     
-    // 生成並儲存翻譯後的 SRT 檔案
+    // 生成並儲存翻譯後的字幕檔案
     console.log('💾 儲存翻譯結果...');
-    const translatedContent = generateSRT(translatedSubtitles);
+    const translatedContent = generateSubtitleFile(translatedSubtitles, outputFile);
     fs.writeFileSync(outputFile, translatedContent, 'utf8');
     
     console.log('🎉 翻譯完成！');
@@ -341,7 +454,11 @@ if (require.main === module) {
 
 module.exports = {
   parseSRT,
+  parseWebVTT,
+  parseSubtitleFile,
   generateSRT,
+  generateWebVTT,
+  generateSubtitleFile,
   autoFixSubtitles,
   translateBatch
 };
