@@ -1,25 +1,41 @@
 {
-  "name": "@willh/gemini-translator",
-  "version": "1.0.3",
-  "type": "module",
+  "name": "@willh/mistral-translator",
+  "version": "1.0.0",
+  "description": "A powerful command-line tool that translates SRT, WebVTT, ASS, Markdown files from English to Traditional Chinese using Mistral AI API.",
   "main": "main.js",
   "bin": {
-    "gemini-translator": "./main.js"
+    "mistral-translator": "./main.js"
   },
   "scripts": {
-    "test": "node tests/test-runner.js",
-    "test:ci": "npm test",
-    "lint": "echo \"Linting with basic checks\" && node -c main.js && node -c promisePool.js",
-    "validate": "npm ls && npm pack --dry-run",
-    "prepare": "npm run lint",
-    "prepublishOnly": "npm run test && npm run validate"
+    "start": "node main.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["gemini", "srt", "subtitle", "translator", "chinese", "traditional", "markdown"],
-  "author": "willh",
+  "keywords": [
+    "translator",
+    "subtitle",
+    "srt",
+    "mistral",
+    "ai",
+    "chinese",
+    "traditional-chinese",
+    "cli"
+  ],
+  "author": "abc0922001",
   "license": "MIT",
-  "description": "A tool to translate SRT, WebVTT, ASS and Markdown files from English to Traditional Chinese using Google Gemini API",
   "dependencies": {
-    "axios": "^1.9.0",
-    "yargs": "^18.0.0"
-  }
+    "axios": "^1.6.0",
+    "yargs": "^17.7.2",
+    "@supercharge/promise-pool": "^3.1.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abc0922001/mistral-translator.git"
+  },
+  "bugs": {
+    "url": "https://github.com/abc0922001/mistral-translator/issues"
+  },
+  "homepage": "https://github.com/abc0922001/mistral-translator#readme"
 }

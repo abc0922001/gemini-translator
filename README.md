@@ -1,351 +1,251 @@
-# Gemini Translator
+# Mistral AI 字幕翻譯工具
 
-<!--
-[![CI](https://github.com/doggy8088/gemini-translator/actions/workflows/ci.yml/badge.svg)](https://github.com/doggy8088/gemini-translator/actions/workflows/ci.yml)
-[![Publish to NPM](https://github.com/doggy8088/gemini-translator/actions/workflows/publish.yml/badge.svg)](https://github.com/doggy8088/gemini-translator/actions/workflows/publish.yml)
-[![Code Quality](https://github.com/doggy8088/gemini-translator/actions/workflows/code-quality.yml/badge.svg)](https://github.com/doggy8088/gemini-translator/actions/workflows/code-quality.yml)
--->
-[![npm version](https://badge.fury.io/js/@willh%2Fgemini-translator.svg)](https://badge.fury.io/js/@willh%2Fgemini-translator)
+一個強大的命令列工具，使用 Mistral AI API 將 SRT 字幕檔從英文翻譯成繁體中文。具備智慧上下文感知翻譯和自動內容摘要功能，提升翻譯品質。
 
-A powerful command-line tool that translates SRT, WebVTT, ASS, Markdown files from English to Traditional Chinese using Google's Gemini AI API. The tool features intelligent context-aware translation with automatic content summarization for improved translation quality.
+## ✨ 功能特色
 
-## Features
+- 🚀 **快速批次處理**：可配置並發數量的批次字幕翻譯
+- 🧠 **上下文感知翻譯**：生成內容摘要以提升翻譯準確度
+- 🔧 **自動修復**：自動修復非連續的字幕編號
+- 📝 **SRT 格式支援**：完整支援標準 SRT 字幕格式
+- ⚡ **平行處理**：最多 5 個並發翻譯任務
+- 🎯 **可自訂模型**：支援不同的 Mistral AI 模型
+- 📊 **進度追蹤**：即時翻譯進度顯示
 
-- 🚀 **Fast Batch Processing**: Translates subtitles in batches with configurable concurrency
-- 🧠 **Context-Aware Translation**: Generates content summary to improve translation accuracy
-- 🔧 **Auto-Fix**: Automatically fixes non-sequential subtitle numbering
-- 📝 **SRT Format Support**: Full support for standard SRT subtitle format
-- ⚡ **Parallel Processing**: Up to 20 concurrent translation tasks
-- 🎯 **Customizable Models**: Support for different Gemini AI models
-- 📊 **Progress Tracking**: Real-time translation progress display
+## 🚀 快速開始
 
-## Installation
-
-### Using npx (Recommended)
-
-No installation required! Run directly with npx:
+### 使用 npx（無需安裝）
 
 ```bash
-npx @willh/gemini-translator --input your-subtitle.srt
+npx @willh/mistral-translator --input your-subtitle.srt
 ```
 
-### Global Installation
+### 全域安裝
 
 ```bash
-npm install -g @willh/gemini-translator
+npm install -g @willh/mistral-translator
 ```
 
-Then run:
+然後執行：
 
 ```bash
-gemini-translator --input your-subtitle.srt
+mistral-translator --input your-subtitle.srt
 ```
 
-## Prerequisites
+## 📋 先決條件
 
-### 1. Get Google Gemini API Key
+### API Key 設定
 
-1. Visit [Google AI Studio](https://aistudio.google.com/app/apikey)
-2. Create a new API key
-3. Set the environment variable:
+1. 取得 Mistral AI API Key
+2. 設定環境變數：
 
-**Windows (PowerShell)**:
-
+**Windows (PowerShell):**
 ```powershell
-$env:GEMINI_API_KEY = "your-api-key-here"
+$env:MISTRAL_API_KEY = "your-api-key-here"
 ```
 
-**Windows (Command Prompt)**:
-
+**Windows (Command Prompt):**
 ```cmd
-set GEMINI_API_KEY=your-api-key-here
+set MISTRAL_API_KEY=your-api-key-here
 ```
 
-**macOS/Linux**:
-
+**macOS/Linux:**
 ```bash
-export GEMINI_API_KEY="your-api-key-here"
+export MISTRAL_API_KEY="your-api-key-here"
 ```
 
-### 2. Node.js
+### Node.js 需求
 
-Ensure you have Node.js 14+ installed. Check with:
+確保已安裝 Node.js 14+，檢查版本：
 
 ```bash
 node --version
 ```
 
-## Usage
+## 📖 使用方法
 
-### Basic Usage
+### 基本翻譯
 
-Translate a subtitle file to Traditional Chinese:
-
-```bash
-npx @willh/gemini-translator --input movie.srt
-```
-
-This will create `movie.zh.srt` in the same directory.
-
-### Advanced Usage
+將字幕檔翻譯成繁體中文：
 
 ```bash
-# Custom output filename
-npx @willh/gemini-translator --input movie.srt --output movie-chinese.srt
-
-# Use specific Gemini model
-npx @willh/gemini-translator --input movie.srt --model gemini-1.5-pro
-
-# Auto-fix subtitle numbering issues
-npx @willh/gemini-translator --input movie.srt --autofix
-
-# Combine options
-npx @willh/gemini-translator -i movie.srt -o output.srt -m gemini-1.5-pro --autofix
+npx @willh/mistral-translator --input movie.srt
 ```
 
-## Command Line Options
+這會在同一目錄下建立 `movie.zh.srt`。
 
-| Option      | Alias | Description                                | Default                          |
-| ----------- | ----- | ------------------------------------------ | -------------------------------- |
-| `--input`   | `-i`  | Input SRT file path (required)             | -                                |
-| `--output`  | `-o`  | Output SRT file path                       | `<input>.zh.srt`                 |
-| `--model`   | `-m`  | Gemini model to use                        | `gemini-2.5-flash-preview-05-20` |
-| `--autofix` | -     | Auto-fix non-sequential subtitle numbering | `false`                          |
-| `--help`    | `-h`  | Show help information                      | -                                |
-
-## How It Works
-
-1. **Content Analysis**: The tool first analyzes the entire subtitle content to generate a summary
-2. **Context Generation**: Creates a context summary including themes, terminology, characters, and style
-3. **Batch Processing**: Divides subtitles into batches of 10 for efficient processing
-4. **Parallel Translation**: Processes up to 20 batches simultaneously using Gemini AI
-5. **Quality Assurance**: Validates translation results and timestamp sequences
-6. **Output Generation**: Creates the final translated SRT file
-
-## Supported Models
-
-- `gemini-2.5-flash-preview-05-20` (default - fastest)
-- `gemini-2.5-pro-preview-06-05` (highest quality)
-- `gemini-2.0-flash` (fast, stable)
-- Other Gemini models as they become available
-
-## Error Handling
-
-The tool includes robust error handling for common issues:
-
-- **Missing API Key**: Clear instructions to set up the environment variable
-- **Invalid SRT Format**: Detailed error messages for format issues
-- **Non-Sequential Numbering**: Option to auto-fix or manual correction guidance
-- **API Errors**: Retry logic and detailed error reporting
-- **Network Issues**: Graceful handling of connection problems
-
-## Examples
-
-### Example 1: Basic Translation
+### 進階選項
 
 ```bash
-npx @willh/gemini-translator --input "My Movie.srt"
-# Output: "My Movie.zh.srt"
+# 自訂輸出檔名
+npx @willh/mistral-translator --input movie.srt --output movie-chinese.srt
+
+# 使用特定 Mistral 模型
+npx @willh/mistral-translator --input movie.srt --model mistral-large-latest
+
+# 自動修復字幕編號問題
+npx @willh/mistral-translator --input movie.srt --autofix
+
+# 組合選項
+npx @willh/mistral-translator -i movie.srt -o output.srt -m mistral-large-latest --autofix
 ```
 
-### Example 2: Batch Processing with Auto-fix
+## ⚙️ 命令列選項
+
+| 選項 | 別名 | 描述 | 預設值 |
+|------|------|------|--------|
+| `--input` | `-i` | 輸入 SRT 檔案路徑（必需） | - |
+| `--output` | `-o` | 輸出 SRT 檔案路徑 | `<input>.zh.srt` |
+| `--model` | `-m` | 使用的 Mistral 模型 | `mistral-small-latest` |
+| `--autofix` | - | 自動修復非連續字幕編號 | `false` |
+| `--help` | `-h` | 顯示說明資訊 | - |
+
+## 🔄 工作流程
+
+1. **內容分析**：工具首先分析整個字幕內容以生成摘要
+2. **上下文生成**：建立包含主題、術語、角色和風格的上下文摘要
+3. **批次處理**：將字幕分成 10 條一批進行高效處理
+4. **平行翻譯**：使用 Mistral AI 同時處理最多 5 個批次
+5. **品質保證**：驗證翻譯結果和時間戳序列
+6. **輸出生成**：建立最終翻譯的 SRT 檔案
+
+## 🤖 支援的模型
+
+- `mistral-small-latest` (預設 - 快速且經濟)
+- `mistral-large-latest` (最高品質)
+- `mistral-medium-latest` (平衡效能與品質)
+- 其他可用的 Mistral 模型
+
+## 🛠️ 錯誤處理
+
+工具包含強健的錯誤處理機制：
+
+- **缺少 API Key**：清楚的設定環境變數指示
+- **無效 SRT 格式**：詳細的格式問題錯誤訊息
+- **非連續編號**：自動修復選項或手動修正指導
+- **API 錯誤**：重試邏輯和詳細錯誤報告
+- **網路問題**：優雅處理連線問題
+
+## 📝 使用範例
+
+### 基本使用
 
 ```bash
-npx @willh/gemini-translator -i "Series S01E01.srt" --autofix
-# Automatically fixes numbering issues and translates
+npx @willh/mistral-translator --input "My Movie.srt"
+# 輸出: "My Movie.zh.srt"
 ```
 
-### Example 3: High-Quality Translation
+### 自動修復編號
 
 ```bash
-npx @willh/gemini-translator -i "Documentary.srt" -m gemini-1.5-pro -o "Documentary-TC.srt"
-# Uses the most advanced model for better accuracy
+npx @willh/mistral-translator -i "Series S01E01.srt" --autofix
+# 自動修復編號問題並翻譯
 ```
 
-## Troubleshooting
+### 使用高品質模型
 
-### Common Issues
+```bash
+npx @willh/mistral-translator -i "Documentary.srt" -m mistral-large-latest -o "Documentary-TC.srt"
+# 使用最先進的模型以獲得更好的準確度
+```
 
-**"請設定 GEMINI\_API\_KEY 環境變數"**
+## 🔧 故障排除
 
-- Solution: Set up your Gemini API key as described in Prerequisites
+### 常見錯誤訊息
+
+**"請設定 MISTRAL_API_KEY 環境變數"**
+- 解決方案：按照先決條件部分設定 Mistral AI API key
 
 **"字幕序號不連續"**
-
-- Solution: Use the `--autofix` flag to automatically correct numbering
+- 解決方案：使用 `--autofix` 標誌自動修正編號
 
 **"翻譯數量與原始字幕數量不符"**
-
-- Solution: Check your internet connection and API key validity
+- 解決方案：檢查網路連線和 API key 有效性
 
 **"找不到輸入檔案"**
+- 解決方案：驗證檔案路徑並確保 SRT 檔案存在
 
-- Solution: Verify the file path and ensure the SRT file exists
+### 效能優化建議
 
-### Performance Tips
+- 使用 `mistral-small-latest` 進行快速處理
+- 使用 `mistral-large-latest` 進行高品質翻譯
+- 確保穩定的網路連線以進行批次處理
+- 大型檔案（1000+ 字幕）可能需要數分鐘處理時間
 
-- Use `gemini-2.5-flash-preview-05-20` for faster processing
-- Use `gemini-1.5-pro` for higher quality translations
-- Ensure stable internet connection for batch processing
-- Large files (1000+ subtitles) may take several minutes
-
-## Development
-
-### Project Structure
+## 📁 專案結構
 
 ```
-gemini-translator/
-├── main.js              # Main application logic
-├── promisePool.js       # Concurrent processing utility
-├── package.json         # Package configuration
-├── scripts/
-│   └── Make_Video.ps1   # Video processing script
-└── README.md           # This file
+mistral-translator/
+├── main.js              # 主要應用程式邏輯
+├── package.json         # 套件配置
+└── README.md           # 此檔案
 ```
 
-### Local Development
+## 🚀 開發設定
 
-1. Clone the repository
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Set up your API key
-4. Test locally:
-   ```bash
-   node main.js --input test.srt
-   ```
+- 複製倉庫
+- 安裝相依套件：
+  ```bash
+  npm install
+  ```
+- 設定你的 API key
+- 本地測試：
+  ```bash
+  node main.js --input test.srt
+  ```
 
-## Publishing to NPM
+## 📦 相依套件
 
-### Prerequisites for Publishing
+- **axios**: Mistral AI API 呼叫的 HTTP 客戶端
+- **yargs**: 命令列參數解析
+- **@supercharge/promise-pool**: 並發處理控制
+- **fs/path**: 檔案系統操作（Node.js 內建）
 
-1. **NPM Account**: Create an account at [npmjs.com](https://www.npmjs.com/)
-2. **NPM CLI**: Install and login
+## 🌐 API 整合
 
-   ```bash
-   npm install -g npm
-   npm login
-   ```
+工具使用 Mistral AI API，具備以下特性：
 
-### Publishing Steps
+- 結構化 JSON 回應格式
+- 上下文感知提示
+- 批次處理優化
+- 錯誤恢復機制
 
-1. **Prepare the Package**
+### 效能配置
 
-   ```bash
-   # Ensure all files are ready
-   npm run test  # If you have tests
+- **批次大小**：每次 API 呼叫 10 條字幕
+- **並發數**：最多 5 個並發請求
+- **速率限制**：由 promise pool 自動處理
+- **記憶體使用**：大型檔案的高效串流處理
 
-   # Check package contents
-   npm pack --dry-run
-   ```
+## 📄 授權條款
 
-2. **Version Management**
+MIT License - 詳見 LICENSE 檔案。
 
-   ```bash
-   # Update version (patch/minor/major)
-   npm version patch  # 1.0.0 -> 1.0.1
-   npm version minor  # 1.0.0 -> 1.1.0
-   npm version major  # 1.0.0 -> 2.0.0
-   ```
+## 🤝 貢獻
 
-3. **Publish to NPM**
+- Fork 倉庫
+- 建立功能分支
+- 進行變更
+- 如適用，新增測試
+- 提交 pull request
 
-   ```bash
-   # For scoped packages (like @willh/gemini-translator)
-   npm publish --access public
+## 📞 支援
 
-   # For regular packages
-   npm publish
-   ```
+如有問題和疑問：
 
-4. **Verify Publication**
+- GitHub Issues: [Repository Issues](https://github.com/yourusername/mistral-translator/issues)
+- Email: [您的電子郵件]
 
-   ```bash
-   # Test installation
-   npx @willh/gemini-translator@latest --help
-   ```
-
-### Publishing Checklist
-
-- [ ] Update version in `package.json`
-- [ ] Ensure `bin` field points to correct executable
-- [ ] Add shebang (`#!/usr/bin/env node`) to main.js
-- [ ] Test with `npm pack --dry-run`
-- [ ] Verify dependencies are correct
-- [ ] Update README.md if needed
-- [ ] Test locally with different SRT files
-- [ ] Publish with `npm publish --access public`
-- [ ] Test installation with `npx`
-
-### Updating the Package
-
-```bash
-# Make your changes
-git add .
-git commit -m "Update: description of changes"
-
-# Update version
-npm version patch
-
-# Publish update
-npm publish --access public
-```
-
-## Technical Details
-
-### Dependencies
-
-- **axios**: HTTP client for Gemini API calls
-- **yargs**: Command-line argument parsing
-- **fs/path**: File system operations (Node.js built-in)
-
-### API Integration
-
-The tool uses Google's Gemini API with:
-
-- Structured JSON response format
-- Context-aware prompting
-- Batch processing optimization
-- Error recovery mechanisms
-
-### Performance Characteristics
-
-- **Batch Size**: 10 subtitles per API call
-- **Concurrency**: Up to 20 parallel requests
-- **Rate Limiting**: Automatically handled by promise pool
-- **Memory Usage**: Efficient streaming for large files
-
-## License
-
-MIT License - see LICENSE file for details.
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
-
-## Support
-
-For issues and questions:
-
-- GitHub Issues: [Repository Issues](https://github.com/doggy8088/gemini-translator/issues)
-- Email: \[Your email]
-
-## Changelog
+## 📈 版本歷史
 
 ### v1.0.0
-
-- Initial release
-- Basic SRT translation functionality
-- Context-aware translation
-- Batch processing with concurrency
-- Auto-fix for subtitle numbering
-- NPX support
+- 初版發布
+- 基本 SRT 翻譯功能
+- 上下文感知翻譯
+- 批次處理與並發
+- 字幕編號自動修復
+- NPX 支援
 
 ---
 
-**Made with ❤️ using Google Gemini AI**
+使用 ❤️ 和 Mistral AI 製作
