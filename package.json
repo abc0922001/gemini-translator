@@ -1,41 +1,80 @@
 {
-  "name": "@willh/mistral-translator",
-  "version": "1.0.0",
-  "description": "A powerful command-line tool that translates SRT, WebVTT, ASS, Markdown files from English to Traditional Chinese using Mistral AI API.",
+  "name": "@abc0922001/mistral-translator",
+  "version": "2.0.0",
+  "description": "A powerful command-line tool that translates SRT, WebVTT, ASS, and Markdown files using Mistral AI API with intelligent context-aware translation",
   "main": "main.js",
   "bin": {
     "mistral-translator": "./main.js"
   },
   "scripts": {
     "start": "node main.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "node main.js --dry-run",
+    "lint": "eslint main.js",
+    "format": "prettier --write main.js",
+    "build": "echo \"No build step required\"",
+    "prepublishOnly": "npm run lint && npm run test"
   },
   "keywords": [
-    "translator",
     "subtitle",
+    "translation",
     "srt",
-    "mistral",
-    "ai",
+    "webvtt",
+    "ass",
+    "markdown",
+    "mistral-ai",
+    "ai-translation",
+    "cli",
+    "command-line",
+    "batch-processing",
+    "multilingual",
     "chinese",
     "traditional-chinese",
-    "cli"
+    "context-aware"
   ],
-  "author": "abc0922001",
+  "author": {
+    "name": "Your Name",
+    "email": "your.email@example.com",
+    "url": "https://github.com/abc0922001"
+  },
   "license": "MIT",
-  "dependencies": {
-    "@supercharge/promise-pool": "^3.2.0",
-    "axios": "^1.9.0",
-    "yargs": "^17.7.2"
-  },
-  "engines": {
-    "node": ">=14.0.0"
-  },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/abc0922001/mistral-translator.git"
+    "url": "https://github.com/abc0922001/mistral-translator.git"
   },
   "bugs": {
     "url": "https://github.com/abc0922001/mistral-translator/issues"
   },
-  "homepage": "https://github.com/abc0922001/mistral-translator#readme"
+  "homepage": "https://github.com/abc0922001/mistral-translator#readme",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "yargs": "^17.7.2",
+    "@supercharge/promise-pool": "^3.2.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.56.0",
+    "prettier": "^3.1.1",
+    "jest": "^29.7.0"
+  },
+  "files": [
+    "main.js",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "preferGlobal": true,
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm64"
+  ]
 }
